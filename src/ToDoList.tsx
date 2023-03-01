@@ -1,35 +1,30 @@
-import { useForm } from "react-hook-form";
-import { useRecoilValue, useSetRecoilState} from "recoil";
-import { toDoState } from "./atoms";
+import { useRecoilState, useRecoilValue} from "recoil";
+import {CategoryList, categoryState, toDoSelector } from "./atoms";
+import CreateCategory from "./CreateCategory";
 import CreateToDo from "./CreateToDo";
-
-// interface Idata {
-//     toDo : string;
-// }
+import ToDo from "./ToDo";
 
 function ToDoList(){
-    const toDos = useRecoilValue(toDoState)
-    // const setToDos = useSetRecoilState(toDoState)
-    // const {register, handleSubmit, setValue} = useForm<Idata>();
-    // const handleValid = (data:Idata)=>{
-    //     setValue("toDo", "")
-    //     setToDos(oldToDos => [...oldToDos, {text:data.toDo, id : Date.now(), category:"TO_DO"}])
-    // }
+    const toDos = useRecoilValue(toDoSelector)
+    const categories = useRecoilValue(CategoryList)
+    const [category, setCategory] = useRecoilState(categoryState);
+    const onInput = (event : React.FormEvent<HTMLSelectElement>) => {
+        setCategory(event.currentTarget.value as any)
+    }
     return (
         <div>
             <h1>To Dos</h1>
+            <CreateToDo/>
             <hr/>
-                {/* <form onSubmit={handleSubmit(handleValid)}>
-                    <input {...register("toDo",{
-                        required : "please write ToDo..."
-                    })} placeholder="Write..."/>
-                    <button>Add</button>
-                </form> */}
-                <CreateToDo/>
+            <select value={category} onInput={onInput}>
+                {categories.map((category)=><option key={categories.indexOf(category)} value={category}>{category}</option>)}
+                {/* <option value={"TO_DO"}>To Do</option>
+                <option value={"DOING"}>Doing</option>
+                <option value={"DONE"}>Done</option> */}
+            </select>
+            <CreateCategory/>
             <hr/>
-            <ul>
-                {toDos.map(toDo => <li key={toDo.id}>{toDo.text}</li>)}
-            </ul>
+            {toDos?.map(toDo=> <ToDo key={toDo.id} {...toDo}></ToDo>)}
         </div>
     );
 }
